@@ -5,6 +5,17 @@ const pem = require('pem')
 const console = require('console')
 const fs = require('fs')
 const path = require('path')
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+var morgan = require('morgan')
+
+
+const app = express();
+
+app.use(morgan('tiny'))
+
+
 
 const argv = require('optimist')
   .usage('Put https in front of your running app\nUsage: $0 <options>\nExample: $0 -t http://localhost:8080 -p 8888 --keys ~')
@@ -20,7 +31,7 @@ const argv = require('optimist')
   .describe('insecure', 'flag to accept insecure connections')
   .argv
 
-function getKeys (callback) {
+function getKeys(callback) {
   const serviceKey = getFile('.key.pem')
   const certificate = getFile('.cert.pem')
 
@@ -41,7 +52,7 @@ function getKeys (callback) {
   }
 }
 
-function getFile (file) {
+function getFile(file) {
   const location = path.resolve(argv.keys || '.', file)
   if (fs.existsSync(location)) {
     return fs.readFileSync(location)
@@ -49,7 +60,7 @@ function getFile (file) {
   return null
 }
 
-function storeFile (file, content) {
+function storeFile(file, content) {
   const location = path.resolve(argv.keys || '.', file)
   fs.writeFileSync(location, content)
 }
@@ -59,9 +70,6 @@ getKeys((err, keys) => {
     console.error(err)
     process.exit(1)
   }
-  httpProxy.createServer({
-    target: argv.target,
-  }).listen(argv.port, _ => {
-    console.log(`HTTPS proxy started on https://localhost:${argv.port}`)
-  })
+  app.use('/', createProxyMiddleware({ target: argv.target, changeOrigin: true }));
+  app.listen(argv.port);
 })

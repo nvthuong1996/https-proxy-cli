@@ -25,7 +25,10 @@
     "standard": "^14.0.2"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "http-proxy": "^1.16.2",
+    "http-proxy-middleware": "^1.0.3",
+    "morgan": "^1.10.0",
     "optimist": "^0.6.1",
     "pem": "^1.9.7"
   }
