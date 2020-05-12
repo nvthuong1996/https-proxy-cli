@@ -61,11 +61,6 @@ getKeys((err, keys) => {
   }
   httpProxy.createServer({
     target: argv.target,
-    ssl: {
-      key: keys.serviceKey,
-      cert: keys.certificate
-    },
-    secure: !argv.insecure
   }).listen(argv.port, _ => {
     console.log(`HTTPS proxy started on https://localhost:${argv.port}`)
   })
